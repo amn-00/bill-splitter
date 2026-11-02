@@ -24,6 +24,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }
 
+// A crashed server can answer with HTML or an empty body, so a failed parse gives null.
+function parseJson(text: string): unknown {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return null
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<Result<T>> {
   let response: Response
   let body: unknown
@@ -34,7 +43,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<Result<
       headers: { 'content-type': 'application/json', ...init.headers },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
-    body = await response.json()
+    body = parseJson(await response.text())
   } catch (err) {
     if (err instanceof DOMException && err.name === 'TimeoutError') {
       return { ok: false, error: 'The server is taking too long. Please try again.' }
@@ -46,6 +55,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<Result<
     const message = isRecord(body) && typeof body.error === 'string' ? body.error : null
     return { ok: false, error: message ?? `Something went wrong (${response.status}).` }
   }
+  if (body === null) return { ok: false, error: 'The server sent an unexpected answer.' }
   // The data comes from our own API, which we trust to match these types.
   return { ok: true, data: body as T }
 }

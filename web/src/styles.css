@@ -1,26 +1,81 @@
 :root {
+  color-scheme: light dark;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --border: #e3e6ea;
+  --divider: #eef0f3;
+  --text: #1f2328;
+  --muted: #6a737d;
+  --accent: #0b62d6;
+  --accent-hover: #0950b0;
+  --link: #0b62d6;
+  --paid: #1a7f37;
+  --paid-bg: #e6f4ea;
+  --error: #c62828;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.06);
   font-family: system-ui, sans-serif;
-  color: #1f2328;
-  background: #f6f7f9;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* Same names, darker values: the rest of the file does not change. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #181b21;
+    --border: #2a2f37;
+    --divider: #23272e;
+    --text: #e6e8eb;
+    --muted: #9aa3ad;
+    --accent: #2f6fd6;
+    --accent-hover: #3d7de3;
+    --link: #6ea8ff;
+    --paid: #4ac26b;
+    --paid-bg: rgb(74 194 107 / 0.15);
+    --error: #ff7b72;
+    --shadow: none;
+  }
+}
+
+body {
+  margin: 0;
 }
 
 main {
   max-width: 560px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 32px 16px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 12px;
 }
 
 h2 {
-  font-size: 1.1rem;
-  margin: 0 0 8px;
+  font-size: 1.05rem;
+  margin: 0;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #d8dde3;
-  border-radius: 8px;
-  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
   margin-top: 16px;
+  box-shadow: var(--shadow);
+}
+
+.bill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.progress {
+  margin: 2px 0 12px;
+  font-size: 0.875rem;
 }
 
 ul {
@@ -30,8 +85,13 @@ ul {
 }
 
 li {
-  padding: 8px 0;
-  border-top: 1px solid #eef0f3;
+  padding: 10px 0;
+  border-top: 1px solid var(--divider);
+}
+
+/* Paid rows fade so the unpaid ones stand out. The "Paid" pill stays clear. */
+li.paid-row .row > :not(:last-child) {
+  opacity: 0.55;
 }
 
 .row {
@@ -42,17 +102,43 @@ li {
 
 .row > :first-child {
   flex: 1;
+  min-width: 0;
+}
+
+/* Digits of the same width, so amounts line up. */
+.amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
 input {
-  padding: 6px 8px;
+  padding: 8px 10px;
   font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 button {
   font: inherit;
-  padding: 6px 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
   cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
 }
 
 button:disabled {
@@ -60,23 +146,55 @@ button:disabled {
   opacity: 0.6;
 }
 
-button.link {
-  border: none;
-  background: none;
-  padding: 0;
-  color: #0b62d6;
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-.muted {
-  color: #6a737d;
+button.link,
+button.link:hover:not(:disabled) {
+  background: none;
+  padding: 0;
+  font-weight: inherit;
+  color: var(--link);
+}
+
+button.link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* The Pay button and the Paid pill have the same width, so the amounts stay in a column. */
+li button,
+.paid {
+  box-sizing: border-box;
+  width: 84px;
+  text-align: center;
+}
+
+li button {
+  padding: 6px 0;
 }
 
 .paid {
-  color: #1a7f37;
+  display: inline-block;
+  padding: 4px 0;
+  border-radius: 999px;
+  background: var(--paid-bg);
+  color: var(--paid);
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
+.muted {
+  color: var(--muted);
+}
+
 .error {
-  color: #c62828;
+  color: var(--error);
   margin: 6px 0 0;
+}
+
+.error + button {
+  margin-top: 12px;
 }

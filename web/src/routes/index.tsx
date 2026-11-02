@@ -73,7 +73,11 @@ function ChooseHome({ onChoose }: { onChoose: (homeId: string) => void }) {
       <button type="button" onClick={handleCreateSample} disabled={creating}>
         {creating ? 'Creating…' : 'Create a sample home'}
       </button>
-      {error && <p className="error">{error}</p>}
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
     </section>
   )
 }
@@ -120,12 +124,20 @@ function Bills({ homeId, onRetry }: { homeId: string; onRetry: () => void }) {
     })
   }
 
-  if (state.status === 'loading') return <p className="muted">Loading bills…</p>
+  if (state.status === 'loading') {
+    return (
+      <p className="muted" role="status">
+        Loading bills…
+      </p>
+    )
+  }
 
   if (state.status === 'error') {
     return (
       <div className="card">
-        <p className="error">Could not load the bills: {state.message}</p>
+        <p className="error" role="alert">
+          Could not load the bills: {state.message}
+        </p>
         <button type="button" onClick={onRetry}>
           Try again
         </button>
@@ -139,9 +151,14 @@ function Bills({ homeId, onRetry }: { homeId: string; onRetry: () => void }) {
     <>
       {state.bills.map((bill) => (
         <section key={bill.id} className="card">
-          <h2>
-            {bill.title} <span className="muted">{formatCents(bill.totalCents)}</span>
-          </h2>
+          <div className="bill-header">
+            <h2>{bill.title}</h2>
+            <span className="amount">{formatCents(bill.totalCents)}</span>
+          </div>
+          <p className="muted progress">
+            {bill.shares.filter((share) => share.paidAt !== null).length} of {bill.shares.length}{' '}
+            paid
+          </p>
           <ul>
             {bill.shares.map((share) => (
               <ShareItem
@@ -183,10 +200,10 @@ function ShareItem({
   }
 
   return (
-    <li>
+    <li className={share.paidAt ? 'paid-row' : undefined}>
       <div className="row">
         <span>{share.memberName}</span>
-        <span>{formatCents(share.amountCents)}</span>
+        <span className="amount">{formatCents(share.amountCents)}</span>
         {share.paidAt ? (
           <span className="paid">Paid</span>
         ) : (
@@ -195,7 +212,11 @@ function ShareItem({
           </button>
         )}
       </div>
-      {error && <p className="error">Payment failed: {error}</p>}
+      {error && (
+        <p className="error" role="alert">
+          Payment failed: {error}
+        </p>
+      )}
     </li>
   )
 }
