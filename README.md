@@ -155,3 +155,17 @@ You must understand every line you submit. We check this with your video and in 
 5. Paste the repository link and the video link in the application form.
 
 We will run `pnpm install && pnpm check && pnpm typecheck && pnpm test` on your repository.
+
+## Decisions
+
+1. **Paying is one conditional `UPDATE`, not read-then-write.** The pay route runs `UPDATE shares ... WHERE id = ? AND bill_id = ? AND paid_at IS NULL RETURNING ...`. D1 runs writes one at a time, so when two requests race, only the first one still finds `paid_at IS NULL` and gets a row back. The other one reads the share: same `Idempotency-Key` gets `200` with the saved `paidAt`, a different key gets `409`. No locks or interactive transactions needed.
+
+2. **Member order is an explicit `position` column, not a timestamp.** Members added in the same millisecond would tie on a timestamp. `position` is computed inside the `INSERT` (`MAX(position) + 1`), and `UNIQUE (home_id, position)` makes a duplicate position impossible. The split and the balances both sort by it.
+
+3. **The `Idempotency-Key` is saved on the share, with a `UNIQUE` constraint.** This keeps the replay logic to one table and makes it impossible for one key to pay two different shares (that answers `409`). Trade-off: a key is remembered forever, not for a limited time like in payment APIs.
+
+Smaller choices:
+- Input is checked before the database is touched. Bad input gets `400` (broken JSON, missing key) or `422` (invalid values), then `404` if the home, bill or share is missing.
+- A bill and its shares are inserted with one `db.batch()`, which is a single transaction, so a bill without shares cannot exist.
+- I added `GET /api/homes/:homeId/bills`, because the web page needs to list bills and the spec has no endpoint for it.
+- The web page never marks a share paid until the server confirms. Each share keeps one `Idempotency-Key` across retries, so retrying after a timeout cannot pay twice.
