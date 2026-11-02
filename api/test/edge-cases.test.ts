@@ -50,16 +50,6 @@ describe('payment edge cases', () => {
     expect(paid.status).toBe(404)
   })
 
-  it('rejects one key used for two different shares', async () => {
-    const { billId, first, second } = await setup()
-    const key = crypto.randomUUID()
-    await pay(billId, first.id, key)
-
-    const reused = await pay(billId, second.id, key)
-
-    expect(reused.status).toBe(409)
-  })
-
   it('rejects an empty Idempotency-Key', async () => {
     const { billId, first } = await setup()
 

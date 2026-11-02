@@ -109,24 +109,14 @@ app.post('/api/bills/:billId/shares/:shareId/pay', async (c) => {
   // One atomic statement: it only changes the share if it is still unpaid.
   // If two requests race, the database runs them one after the other, so
   // only the first one finds paid_at IS NULL and gets a row back.
-  let paid: ShareRow | null
-  try {
-    paid = await db
-      .prepare(
-        `UPDATE shares SET paid_at = ?, idempotency_key = ?
-         WHERE id = ? AND bill_id = ? AND paid_at IS NULL
-         RETURNING id, member_id, amount_cents, paid_at`,
-      )
-      .bind(new Date().toISOString(), key, shareId, billId)
-      .first<ShareRow>()
-  } catch (err) {
-    if (err instanceof Error && err.message.includes('shares.idempotency_key')) {
-      throw new HTTPException(409, {
-        message: 'Idempotency-Key was already used for another share',
-      })
-    }
-    throw err
-  }
+  const paid = await db
+    .prepare(
+      `UPDATE shares SET paid_at = ?, idempotency_key = ?
+       WHERE id = ? AND bill_id = ? AND paid_at IS NULL
+       RETURNING id, member_id, amount_cents, paid_at`,
+    )
+    .bind(new Date().toISOString(), key, shareId, billId)
+    .first<ShareRow>()
   if (paid) return c.json(toShare(paid), 200)
 
   // Nothing changed: the share does not exist on this bill, or it is already paid.

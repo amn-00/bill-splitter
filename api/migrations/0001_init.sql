@@ -41,7 +41,5 @@ CREATE TABLE shares (
   CONSTRAINT fk_shares_bill FOREIGN KEY (bill_id) REFERENCES bills (id),
   CONSTRAINT fk_shares_member FOREIGN KEY (member_id) REFERENCES members (id),
   -- A share can be 0 (e.g. 2 cents split between 3 people) but never negative.
-  CONSTRAINT ck_shares_amount_not_negative CHECK (amount_cents >= 0),
-  -- One Idempotency-Key can pay only one share.
-  CONSTRAINT uq_shares_idempotency_key UNIQUE (idempotency_key)
+  CONSTRAINT ck_shares_amount_not_negative CHECK (amount_cents >= 0)
 );

@@ -162,7 +162,7 @@ We will run `pnpm install && pnpm check && pnpm typecheck && pnpm test` on your 
 
 2. **Member order is an explicit `position` column, not a timestamp.** Members added in the same millisecond would tie on a timestamp. `position` is computed inside the `INSERT` (`MAX(position) + 1`), and `UNIQUE (home_id, position)` makes a duplicate position impossible. The split and the balances both sort by it.
 
-3. **The `Idempotency-Key` is saved on the share, with a `UNIQUE` constraint.** This keeps the replay logic to one table and makes it impossible for one key to pay two different shares (that answers `409`). Trade-off: a key is remembered forever, not for a limited time like in payment APIs.
+3. **The `Idempotency-Key` is saved on the share it paid.** A repeated request is recognised by comparing the key with the one saved on that share, so the replay logic needs no extra table. The key only matters for its own share, so the same key used on two different shares pays both, which the spec allows. Trade-off: a key is remembered forever, not for a limited time like in payment APIs.
 
 Smaller choices:
 - Input is checked before the database is touched. Bad input gets `400` (broken JSON, missing key) or `422` (invalid values), then `404` if the home, bill or share is missing.
