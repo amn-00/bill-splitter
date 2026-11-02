@@ -115,7 +115,7 @@ pnpm install
 pnpm dev          # api on :8787 and web on :5173
 ```
 
-Open http://localhost:5173. The starter page shows a title. `/api/health` returns `{ "status": "ok" }`.
+Open http://localhost:5173 and click **Create a sample home**, or paste the ID of a home created through the API. `/api/health` returns `{ "status": "ok" }`.
 
 ```bash
 pnpm test         # run the visible tests in api/test
@@ -168,4 +168,5 @@ Smaller choices:
 - Input is checked before the database is touched. Bad input gets `400` (broken JSON, missing key) or `422` (invalid values), then `404` if the home, bill or share is missing.
 - A bill and its shares are inserted with one `db.batch()`, which is a single transaction, so a bill without shares cannot exist.
 - I added `GET /api/homes/:homeId/bills`, because the web page needs to list bills and the spec has no endpoint for it.
+- Homes, members and bills are created through the API only, as the spec describes. The page's **Create a sample home** button calls those same endpoints to fill in demo data.
 - The web page never marks a share paid until the server confirms. Each share keeps one `Idempotency-Key` across retries, so retrying after a timeout cannot pay twice.
