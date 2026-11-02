@@ -1,0 +1,82 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #1f2328;
+  background: #f6f7f9;
+}
+
+main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 8px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d8dde3;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  padding: 8px 0;
+  border-top: 1px solid #eef0f3;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.row > :first-child {
+  flex: 1;
+}
+
+input {
+  padding: 6px 8px;
+  font: inherit;
+}
+
+button {
+  font: inherit;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+button.link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #0b62d6;
+}
+
+.muted {
+  color: #6a737d;
+}
+
+.paid {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+.error {
+  color: #c62828;
+  margin: 6px 0 0;
+}
