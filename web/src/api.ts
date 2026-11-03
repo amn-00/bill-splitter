@@ -80,9 +80,9 @@ export async function createSampleHome(): Promise<Result<string>> {
   if (!home.ok) return home
 
   const steps = [
-    ...['Asha', 'Ben', 'Chitra'].map((name) => ({ path: 'members', body: { name } })),
-    { path: 'bills', body: { title: 'Electricity', totalCents: 1000 } },
-    { path: 'bills', body: { title: 'Internet', totalCents: 2999 } },
+    ...['Aryan', 'Akash', 'Harsh'].map((name) => ({ path: 'members', body: { name } })),
+    { path: 'bills', body: { title: 'Electricity', totalCents: 100_000 } },
+    { path: 'bills', body: { title: 'Internet', totalCents: 299_900 } },
   ]
   for (const step of steps) {
     const result = await request(`/api/homes/${home.data.id}/${step.path}`, {

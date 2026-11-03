@@ -10,8 +10,11 @@ export const Route = createFileRoute('/')({
   component: Page,
 })
 
+// Amounts are in paise (100 paise = 1 rupee), shown as rupees with Indian commas: ₹1,00,000.00.
+const rupees = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' })
+
 function formatCents(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`
+  return rupees.format(cents / 100)
 }
 
 function Page() {
